@@ -90,5 +90,6 @@ public class SystemSettings {
         Settings.System.COLOR_BUCKET_OVERLAY,
         Settings.System.RINGTONE_VIBRATION_PATTERN,
         Settings.System.CUSTOM_RINGTONE_VIBRATION_PATTERN,
+        Settings.System.LOCKSCREEN_MEDIA_METADATA,
     };
 }
