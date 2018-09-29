@@ -908,18 +908,6 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         mDisplayManager = mContext.getSystemService(DisplayManager.class);
 
-        mNeedsNavigationBar = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_showNavigationBar);
-
-        // Allow a system property to override this. Used by the emulator.
-        // See also hasNavigationBar().
-        String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
-        if ("1".equals(navBarOverride)) {
-            mNeedsNavigationBar = false;
-        } else if ("0".equals(navBarOverride)) {
-            mNeedsNavigationBar = true;
-        }
-
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         mDreamManager = IDreamManager.Stub.asInterface(
                 ServiceManager.checkService(DreamService.DREAM_SERVICE));
@@ -4677,7 +4665,6 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     protected NavigationBarController mNavigationBarController;
     private NavigationBarController.SystemUiVisibility mNavigationBarSystemUiVisibility;
-    private boolean mNeedsNavigationBar;
 
     // UI-specific methods
 
