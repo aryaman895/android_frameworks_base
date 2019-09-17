@@ -87,5 +87,6 @@ public class SystemSettings {
         Settings.System.SMART_SPACE,
         Settings.System.DOUBLE_TAP_SLEEP_GESTURE,
         Settings.System.DOUBLE_TAP_SLEEP_LOCKSCREEN,
+        Settings.System.COLOR_BUCKET_OVERLAY,
     };
 }
