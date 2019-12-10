@@ -20,10 +20,12 @@ import static android.app.StatusBarManager.DISABLE2_QUICK_SETTINGS;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.ContentResolver;
 import android.content.res.ColorUtils;
+import android.content.om.IOverlayManager;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.graphics.Color;
@@ -31,8 +33,11 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -93,9 +98,12 @@ public class QSContainerImpl extends FrameLayout implements ColorExtractor.OnCol
     private boolean mSetQsFromResources;
 
     private SysuiColorExtractor mColorExtractor;
+    private IOverlayManager mOverlayManager;
 
     public QSContainerImpl(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mOverlayManager = IOverlayManager.Stub.asInterface(
+                ServiceManager.getService(Context.OVERLAY_SERVICE));
         Handler handler = new Handler();
         SettingsObserver settingsObserver = new SettingsObserver(handler);
         settingsObserver.observe();
@@ -216,9 +224,21 @@ public class QSContainerImpl extends FrameLayout implements ColorExtractor.OnCol
         int currentColor = mSetQsFromWall ? getWallpaperColor() : mQsBackGroundColor;
         if (mSetQsFromResources) {
             mQsBackGround = getContext().getDrawable(R.drawable.qs_background_primary);
+            try {
+                mOverlayManager.setEnabled("com.android.systemui.qstheme.color",
+                        false, ActivityManager.getCurrentUser());
+            } catch (RemoteException e) {
+                Log.w("QSContainerImpl", "Can't change qs theme", e);
+            }
         } else {
             if (mQsBackGround != null) {
                 mQsBackGround.setColorFilter(currentColor, PorterDuff.Mode.SRC_ATOP);
+            }
+            try {
+                mOverlayManager.setEnabled("com.android.systemui.qstheme.color",
+                        true, ActivityManager.getCurrentUser());
+            } catch (RemoteException e) {
+                Log.w("QSContainerImpl", "Can't change qs theme", e);
             }
         }
 
