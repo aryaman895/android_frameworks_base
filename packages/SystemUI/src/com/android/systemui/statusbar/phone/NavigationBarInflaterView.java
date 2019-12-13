@@ -21,6 +21,7 @@ import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.Icon;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -145,7 +146,8 @@ public class NavigationBarInflaterView extends FrameLayout
 
     protected String getDefaultLayout() {
         final int defaultResource = QuickStepContract.isGesturalMode(mNavBarMode)
-                ? R.string.config_navBarLayoutHandle
+                ? (showDpadArrowKeys() ? R.string.config_navBarLayoutHandleArrows
+                : R.string.config_navBarLayoutHandle)
                 : mOverviewProxyService.shouldShowSwipeUpUI()
                         ? R.string.config_navBarLayoutQuickstep
                         : R.string.config_navBarLayout;
@@ -163,11 +165,13 @@ public class NavigationBarInflaterView extends FrameLayout
         super.onAttachedToWindow();
         Dependency.get(TunerService.class).addTunable(this, NAVBAR_LAYOUT_VIEWS);
         Dependency.get(TunerService.class).addTunable(this, NAVBAR_INVERSE_LAYOUT);
+        Dependency.get(TunerService.class).addTunable(this, Settings.System.NAVIGATION_BAR_ARROW_KEYS);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         Dependency.get(NavigationModeController.class).removeListener(this);
+        Dependency.get(TunerService.class).removeTunable(this);
         Dependency.get(TunerService.class).removeTunable(this);
         super.onDetachedFromWindow();
     }
@@ -530,7 +534,9 @@ public class NavigationBarInflaterView extends FrameLayout
 
     private void clearAllChildren(ViewGroup group) {
         for (int i = 0; i < group.getChildCount(); i++) {
-            ((ViewGroup) group.getChildAt(i)).removeAllViews();
+            if (group.getChildAt(i).getId() != R.id.dpad_group) {
+                ((ViewGroup) group.getChildAt(i)).removeAllViews();
+            }
         }
     }
 
@@ -542,5 +548,14 @@ public class NavigationBarInflaterView extends FrameLayout
         pw.println("NavigationBarInflaterView {");
         pw.println("      mCurrentLayout: " + mCurrentLayout);
         pw.println("    }");
+    }
+
+    private boolean showDpadArrowKeys() {
+        return Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.NAVIGATION_BAR_ARROW_KEYS, 0, UserHandle.USER_CURRENT) != 0;
+    }
+
+    public void onIntSettingChanged(String key, Integer newValue) {
+        onLikelyDefaultLayoutChange();
     }
 }
