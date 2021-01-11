@@ -443,6 +443,8 @@ public class NotificationPanelViewController extends PanelViewController {
     private GestureDetector mDoubleTapGesture;
     private GestureDetector mLockscreenDoubleTapToSleep;
     private boolean mIsLockscreenDoubleTapEnabled;
+    private int mQsSmartPullDown;
+    private int mOneFingerQuickSettingsIntercept;
 
     /**
      * Cache the resource id of the theme to avoid unnecessary work in onThemeChanged.
@@ -462,8 +464,6 @@ public class NotificationPanelViewController extends PanelViewController {
     private boolean mShowingKeyguardHeadsUp;
     private boolean mAllowExpandForSmallExpansion;
     private Runnable mExpandAfterLayoutRunnable;
-
-    private int mQsSmartPullDown;
 
     /**
      * Is this a collapse that started on the panel where we should allow the panel to intercept
@@ -503,8 +503,6 @@ public class NotificationPanelViewController extends PanelViewController {
             return super.performAccessibilityAction(host, action, args);
         }
     };
-
-    private int mOneFingerQuickSettingsIntercept;
 
     @Inject
     public NotificationPanelViewController(NotificationPanelView view,
@@ -1413,6 +1411,9 @@ public class NotificationPanelViewController extends PanelViewController {
                 break;
             case 2: // Left side pulldown
                 showQsOverride = mView.isLayoutRtl() ? w - region < x : x < region;
+                break;
+            case 3: // pull down anywhere
+                showQsOverride = true;
                 break;
         }
         showQsOverride &= mBarState == StatusBarState.SHADE;
@@ -3799,8 +3800,13 @@ public class NotificationPanelViewController extends PanelViewController {
 
         @Override
         public void onTuningChanged(String key, String newValue) {
-            if (STATUS_BAR_QUICK_QS_PULLDOWN.equals(key)) {
-                mOneFingerQuickSettingsIntercept = TunerService.parseInteger(newValue, 1);
+            switch (key) {
+                case STATUS_BAR_QUICK_QS_PULLDOWN:
+                    mOneFingerQuickSettingsIntercept =
+                            TunerService.parseInteger(newValue, 0);
+                    break;
+                default:
+                    break;
             }
         }
     }
