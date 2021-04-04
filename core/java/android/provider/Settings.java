@@ -5963,6 +5963,12 @@ public final class Settings {
         public static final String LOCKSCREEN_SOLID_UNITS_OPACITY = "lockscreen_solid_units_opacity";
 
         /**
+         * Control how to handle the display cutout
+         * @hide
+         */
+        public static final String SYSUI_COLORS_ACTIVE = "sysui_colors_active";
+
+        /**
          * SBC HD priority - whether to use dual channel for SBC by default
          * @hide
          */
