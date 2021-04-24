@@ -5894,6 +5894,12 @@ public final class Settings {
         public static final String NETWORK_TRAFFIC_VIEW_LOCATION = "network_traffic_view_location";
 
         /**
+         * Whether to change the transparency of the notifications
+         * @hide
+         */
+        public static final String NOTIFICATION_BG_ALPHA = "notification_bg_alpha";
+
+        /**
          * Whether to enable the pixel navbar animation
          * @hide
          */
